@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Churn Prediction</title>
+    <style>
+        body { font-family: Arial; max-width: 400px; margin: auto; }
+        .yes { color: red; font-weight: bold; }
+        .no { color: green; font-weight: bold; }
+        progress { width: 100%; height: 20px; }
+    </style>
+</head>
+<body>
+
+<h2>Customer Churn Prediction</h2>
+
+<label>Tenure</label>
+<input id="tenure" type="number"><br><br>
+
+<label>Monthly Charges</label>
+<input id="monthly" type="number"><br><br>
+
+<label>Total Charges</label>
+<input id="total" type="number"><br><br>
+
+<button onclick="predict()">Predict</button>
+
+<h3 id="result"></h3>
+<progress id="bar" max="1" value="0"></progress>
+
+<script>
+function predict() {
+    fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            gender: "Female",
+            SeniorCitizen: 0,
+            Partner: "No",
+            Dependents: "No",
+            tenure: Number(tenure.value),
+            PhoneService: "Yes",
+            MultipleLines: "No",
+            InternetService: "DSL",
+            OnlineSecurity: "No",
+            OnlineBackup: "Yes",
+            DeviceProtection: "No",
+            TechSupport: "No",
+            StreamingTV: "No",
+            StreamingMovies: "No",
+            Contract: "Month-to-month",
+            PaperlessBilling: "Yes",
+            PaymentMethod: "Electronic check",
+            MonthlyCharges: Number(monthly.value),
+            TotalCharges: Number(total.value)
+        })
+    })
+    .then(res => res.json())
+    .then(d => {
+        bar.value = d.churn_probability;
+        result.innerHTML =
+            d.churn_prediction
+            ? `<span class="yes">Likely to Churn</span>`
+            : `<span class="no">Not Likely to Churn</span>`;
+    });
+}
+</script>
+
+</body>
+</html>
